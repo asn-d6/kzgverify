@@ -45,7 +45,7 @@ def fft(vals, modulus, rootz, inv=False):
     assert len(rootz) >= len(vals) + 1
     # Fill in vals with zeroes if needed
     if len(rootz) > len(vals) + 1:
-        vals = vals + [0] * (len(rootz) - len(vals) - 1)
+        vals = vals + ([b.Z1] if type(vals[0]) == tuple else [0]) * (len(rootz) - len(vals) - 1)
     if inv:
         # Inverse FFT
         invlen = pow(len(vals), modulus-2, modulus)
