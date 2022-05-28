@@ -48,13 +48,11 @@ class Blob(object):
         assert len(data) == DATA_BYTES_PER_BLOB
 
         # Split the data into field elements
-        field_elements = [int.from_bytes(data[i*31:(i+1)*31], byteorder='big') for i in range(params.FIELD_ELEMENTS_PER_BLOB)]
-        self.samples = [Sample(field_elements[i:i+16]) for i in range(SAMPLES_PER_BLOB)]
+        data_points = [int.from_bytes(data[i*31:(i+1)*31], byteorder='big') for i in range(params.FIELD_ELEMENTS_PER_BLOB)]
+        self.samples = [Sample(data_points[i:i+16]) for i in range(SAMPLES_PER_BLOB)]
 
-        # Get blob polynomial in coefficient form
-        poly = fft(blob, MODULUS, ROOTS_OF_UNITY, inv=True)
-        # Get commitment to blob polynomial
-        kzg.create_kzg_commitment(poly, setup_G1)
+        # Get commitment to polynomial
+        self.commitment = blob_to_commitment(data_points)
 
 class BlobsMatrix(object):
     """

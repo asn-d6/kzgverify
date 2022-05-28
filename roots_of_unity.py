@@ -6,7 +6,7 @@ MODULUS = b.curve_order
 
 PRIMITIVE_ROOT_OF_UNITY = 7
 
-def roots_of_unity(order):
+def get_roots_of_unity(order):
     """
     Compute a list of roots of unity for a given order.
     The order must divide the BLS multiplicative group order, i.e. MODULUS - 1
@@ -22,4 +22,4 @@ def roots_of_unity(order):
         current_root_of_unity = current_root_of_unity * root_of_unity % MODULUS
     return roots
 
-ROOTS_OF_UNITY = roots_of_unity(params.FIELD_ELEMENTS_PER_BLOB)
+ROOTS_OF_UNITY = get_roots_of_unity(params.FIELD_ELEMENTS_PER_BLOB)
