@@ -37,6 +37,12 @@ def expand_root_of_unity(root_of_unity, modulus):
     return rootz
 
 def fft(vals, modulus, rootz, inv=False):
+    assert rootz[0] == 1
+    # Add missing trailing 1 to rootz
+    if len(rootz) == 1 or rootz[-1] != 1:
+        rootz.append(1)
+    # Make sure we have enough roots of unity
+    assert len(rootz) >= len(vals) + 1
     # Fill in vals with zeroes if needed
     if len(rootz) > len(vals) + 1:
         vals = vals + [0] * (len(rootz) - len(vals) - 1)
