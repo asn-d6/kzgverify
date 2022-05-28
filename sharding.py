@@ -12,8 +12,8 @@ DATA_BYTES_PER_BLOB = 31 * params.FIELD_ELEMENTS_PER_BLOB
 
 # XXX no error correction atm
 # Dimensions of our matrix
-N_MATRIX_ROWS = 16
-N_MATRIX_COLUMNS = 16
+N_MATRIX_ROWS = 4
+N_MATRIX_COLUMNS = 4
 
 # Each column is a sample
 SAMPLES_PER_BLOB = N_MATRIX_COLUMNS
@@ -52,7 +52,7 @@ class Blob(object):
         self.samples = [Sample(data_points[i:i+16]) for i in range(SAMPLES_PER_BLOB)]
 
         # Get commitment to polynomial
-        self.commitment = blob_to_commitment(data_points)
+        self.commitment = kzg.blob_to_commitment(data_points)
 
 class BlobsMatrix(object):
     """

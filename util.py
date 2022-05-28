@@ -1,15 +1,9 @@
 from py_ecc import optimized_bls12_381 as b
 
-def lincomb(points, scalars):
-    """
-    BLS multiscalar multiplication. This function can be optimized using Pippenger's algorithm and variants.
-    """
-    assert len(points) == len(scalars)
+import multicombs
 
-    r = b.Z1
-    for x, a in zip(points, scalars):
-        r = b.add(r, b.multiply(x, a))
-    return r
+def lincomb(points, scalars):
+    return multicombs.lincomb(points, scalars, b.add, b.Z1)
 
 def vector_lincomb(vectors, scalars):
     """

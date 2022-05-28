@@ -4,7 +4,6 @@ from py_ecc import optimized_bls12_381 as b
 
 from roots_of_unity import ROOTS_OF_UNITY, get_roots_of_unity
 from trusted_setup import SETUP_G1, SETUP_G2
-
 import fft
 import params
 import polynomials
