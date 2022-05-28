@@ -2,7 +2,7 @@ import time, random
 
 from py_ecc import optimized_bls12_381 as b
 
-from roots_of_unity import ROOTS_OF_UNITY, get_roots_of_unity
+from roots_of_unity import ROOTS_OF_UNITY
 from trusted_setup import SETUP_G1, SETUP_G2
 import fft
 import params
@@ -17,7 +17,9 @@ def create_kzg_commitment(polynomial):
 
 def blob_to_commitment(blob):
     degree = len(blob)
-    polynomial = fft.fft(blob, MODULUS, get_roots_of_unity(degree), inv=True)
+    assert util.is_power_of_two(degree)
+
+    polynomial = fft.fft(blob, MODULUS, ROOTS_OF_UNITY[:degree], inv=True)
     return create_kzg_commitment(polynomial)
 
 def create_kzg_proof(polynomial, x):
@@ -35,13 +37,13 @@ def verify_kzg_proof(commitment, x, y, proof):
 
     return pairing == b.FQ12.one()
 
-def create_kzg_multiproof(polynomial, x, n):
+def create_kzg_multiproof(polynomial, h, n):
     """
-    Compute Kate proof for polynomial in coefficient form at positions x * w^y where w is
+    Compute Kate proof for polynomial in coefficient form at positions h * w^y where w is
     an n-th root of unity (this is the proof for one data availability sample, which consists
-    of several polynomial evaluations)
+    of several polynomial evaluations). `h` is the shifting factor of the coset.
     """
-    zero_poly = [-pow(x, n, MODULUS)] + [0] * (n - 1) + [1]
+    zero_poly = [-pow(h, n, MODULUS)] + [0] * (n - 1) + [1]
     quotient_polynomial = polynomials.div_polys(polynomial, zero_poly)
     return util.lincomb(SETUP_G1[:len(quotient_polynomial)], quotient_polynomial)
 
@@ -54,10 +56,11 @@ def verify_kzg_multiproof(commitment, x, ys, proof):
         return x * polynomials.inv(y) % MODULUS
 
     n = len(ys)
+    assert util.is_power_of_two(n)
 
     # Interpolate at a coset. Note because it is a coset, not the subgroup, we have to multiply the
     # polynomial coefficients by x^i
-    interpolation_polynomial = fft.fft(ys, MODULUS, get_roots_of_unity(n), inv=True)
+    interpolation_polynomial = fft.fft(ys, MODULUS, ROOTS_OF_UNITY[:n], inv=True)
     interpolation_polynomial = [div(c, pow(x, i, MODULUS)) for i, c in enumerate(interpolation_polynomial)]
 
     # Verify the pairing equation
@@ -98,7 +101,7 @@ if __name__ == "__main__":
     print("verified faulty kzg proof: {:.3f}s".format(get_time_delta()))
 
     # Test blob_to_commitment()
-    evaluations = [polynomials.evaluate_poly_in_coefficient_form(polynomial, z) for z in get_roots_of_unity(32)]
+    evaluations = [polynomials.evaluate_poly_in_coefficient_form(polynomial, z) for z in ROOTS_OF_UNITY[:32]]
     commitment2 = blob_to_commitment(evaluations)
     assert b.eq(commitment, commitment2)
     print("tested blob to commttment: {:.3f}s".format(get_time_delta()))
@@ -106,7 +109,7 @@ if __name__ == "__main__":
     multiproof = create_kzg_multiproof(polynomial, x, 16)
     print("created multiproof: {:.3f}s".format(get_time_delta()))
 
-    omega = get_roots_of_unity(16)[1]
+    omega = ROOTS_OF_UNITY[:16][1]
     coset = [x * pow(omega, i, MODULUS) for i in range(16)]
     ys = [polynomials.evaluate_poly_in_coefficient_form(polynomial, z) for z in coset]
 

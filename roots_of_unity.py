@@ -1,6 +1,7 @@
 from py_ecc import optimized_bls12_381 as b
 
 import params
+import util
 
 MODULUS = b.curve_order
 
@@ -22,4 +23,4 @@ def get_roots_of_unity(order):
         current_root_of_unity = current_root_of_unity * root_of_unity % MODULUS
     return roots
 
-ROOTS_OF_UNITY = get_roots_of_unity(params.FIELD_ELEMENTS_PER_BLOB)
+ROOTS_OF_UNITY = util.list_to_reverse_bit_order(get_roots_of_unity(params.FIELD_ELEMENTS_PER_BLOB))
