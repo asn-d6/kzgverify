@@ -91,33 +91,3 @@ def interpolate_polynomial(xs, ys):
             if nums[i][j] and ys[i]:
                 b[j] += nums[i][j] * yslice
     return [x % MODULUS for x in b]
-
-time_cache = [time.time()]
-def get_time_delta():
-    time_cache.append(time.time())
-    return time_cache[-1] - time_cache[-2]
-
-if __name__ == '__main__':
-    random.seed(1)
-
-    # Generate random blob
-    blob = [random.randint(0, MODULUS) for i in range(params.FIELD_ELEMENTS_PER_BLOB)]
-    print("generated random blob: {:.3f}s".format(get_time_delta()))
-
-    # Do an IFFT to get coefficient form of the blob polynomial
-    coefs = fft(blob, MODULUS, ROOTS_OF_UNITY, inv=True)
-    print("got coeff form using IFFT: {:.3f}s".format(get_time_delta()))
-
-    # Let's do `n` evaluations on the `xs` and make sure we can interpolate back
-    xs = range(1, params.FIELD_ELEMENTS_PER_BLOB+1)
-    evaluations = []
-    for x in xs:
-        y = evaluate_poly_in_coefficient_form(coefs, x)
-        evaluations.append(y)
-    print("performed evaluations in coeff form: {:.3f}s".format(get_time_delta()))
-
-    # Check that the interpolated polynomial matches
-    interpolated_poly = interpolate_polynomial(xs, evaluations)
-    print("interpolated first: {:.3f}s".format(get_time_delta()))
-
-    assert interpolated_poly == coefs

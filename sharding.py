@@ -98,32 +98,3 @@ class BlobsMatrix(object):
     def get_random_sample(self):
         r = random.randrange(0, N_SAMPLES_TOTAL)
         return self._get_sample(r)
-
-    def _get_row(self, r):
-        return self.blobs[r].samples
-
-    def get_random_row_samples(self):
-        r = random.randrange(0, N_MATRIX_ROWS)
-        return self._get_row(r)
-
-    def _get_column(self, r):
-        return [blob.samples[r] for blob in self.blobs]
-
-    def get_random_column_samples(self):
-        r = random.randrange(0, N_MATRIX_COLUMNS)
-        return self._get_column(r)
-
-time_cache = [time.time()]
-def get_time_delta():
-    time_cache.append(time.time())
-    return time_cache[-1] - time_cache[-2]
-
-if __name__ == '__main__':
-    bm = BlobsMatrix()
-    print("created blobs matrix: {:.3f}s".format(get_time_delta()))
-
-    sample, commitment = bm.get_random_sample()
-    print("got random sample: {:.3f}s".format(get_time_delta()))
-
-    assert sample.verify_multiproof(commitment)
-    print("verified multiproof: {:.3f}s".format(get_time_delta()))
