@@ -10,13 +10,19 @@ with open('trusted_setup_G1.json', 'r') as f:
 with open('trusted_setup_G2.json', 'r') as f:
     trusted_setup_G2 = json.load(f)
 
-SETUP_G1 = []
-for point in trusted_setup_G1["setup_G1"]:
-    SETUP_G1.append((b.FQ(int(point[0])), b.FQ(int(point[1])), b.FQ.one()))
+SETUP = []
 
-SETUP_G2 = []
-for point in trusted_setup_G2['setup_G2']:
-    SETUP_G2.append((b.FQ2((int(point[0][0]), int(point[0][1]))), b.FQ2((int(point[1][0]), int(point[1][1]))), b.FQ2.one()))
+setup_G1 = []
+for point in trusted_setup_G1["setup_G1"][:-1]:
+    setup_G1.append((b.FQ(int(point[0])), b.FQ(int(point[1])), b.FQ.one()))
+
+SETUP.append(setup_G1)
+
+setup_G2 = []
+for point in trusted_setup_G2['setup_G2'][:-1]:
+    setup_G2.append((b.FQ2((int(point[0][0]), int(point[0][1]))), b.FQ2((int(point[1][0]), int(point[1][1]))), b.FQ2.one()))
+
+SETUP.append(setup_G2)
 
 if __name__ == '__main__':
     def serialize_g1(point):

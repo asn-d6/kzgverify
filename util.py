@@ -1,6 +1,10 @@
 from py_ecc import optimized_bls12_381 as b
 
+from trusted_setup import SETUP
+from imported.kzg_proofs import is_power_of_two, get_root_of_unity
 import multicombs
+
+MODULUS = b.curve_order
 
 def lincomb(points, scalars):
     return multicombs.lincomb(points, scalars, b.add, b.Z1)
@@ -15,9 +19,6 @@ def vector_lincomb(vectors, scalars):
         for i, x in enumerate(v):
             r[i] = (r[i] + a * x) % MODULUS
     return [BLSFieldElement(x) for x in r]
-
-def is_power_of_two(x):
-    return x > 0 and x & (x-1) == 0
 
 def reverse_bit_order(n, order):
     """
