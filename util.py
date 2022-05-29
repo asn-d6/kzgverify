@@ -34,3 +34,8 @@ def list_to_reverse_bit_order(l):
     Convert a list between normal and reverse bit order. This operation is idempotent.
     """
     return [l[reverse_bit_order(i, len(l))] for i in range(len(l))]
+
+def get_coset_factor(j, N_locs):
+    order = len(SETUP[0])
+    root = get_root_of_unity(order)
+    return pow(root, list_to_reverse_bit_order(range(order))[N_locs * j], MODULUS)
