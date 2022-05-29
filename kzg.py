@@ -2,7 +2,7 @@ import time, random
 
 from py_ecc import optimized_bls12_381 as b
 
-from roots_of_unity import ROOTS_OF_UNITY
+from roots_of_unity import get_roots_of_unity
 from trusted_setup import SETUP_G1, SETUP_G2
 import fft
 import params
@@ -16,10 +16,11 @@ def create_kzg_commitment(polynomial):
     return util.lincomb(SETUP_G1[:len(polynomial)], polynomial)
 
 def blob_to_commitment(blob):
+    """Interpolate a polynomial (coefficients) from a blob in reverse bit order"""
     degree = len(blob)
     assert util.is_power_of_two(degree)
 
-    polynomial = fft.fft(blob, MODULUS, ROOTS_OF_UNITY[:degree], inv=True)
+    polynomial = fft.fft(util.list_to_reverse_bit_order(blob), MODULUS, get_roots_of_unity(degree), inv=True)
     return create_kzg_commitment(polynomial)
 
 def create_kzg_proof(polynomial, x):
@@ -60,7 +61,7 @@ def verify_kzg_multiproof(commitment, x, ys, proof):
 
     # Interpolate at a coset. Note because it is a coset, not the subgroup, we have to multiply the
     # polynomial coefficients by x^i
-    interpolation_polynomial = fft.fft(ys, MODULUS, ROOTS_OF_UNITY[:n], inv=True)
+    interpolation_polynomial = fft.fft(ys, MODULUS, get_roots_of_unity(n), inv=True)
     interpolation_polynomial = [div(c, pow(x, i, MODULUS)) for i, c in enumerate(interpolation_polynomial)]
 
     # Verify the pairing equation

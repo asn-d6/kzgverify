@@ -7,7 +7,7 @@ from kzg import create_kzg_proof, verify_kzg_proof, create_kzg_commitment, blob_
 from polynomials import evaluate_poly_in_coefficient_form, interpolate_polynomial
 from fft import fft
 from sharding import BlobsMatrix
-from roots_of_unity import ROOTS_OF_UNITY
+from roots_of_unity import ROOTS_OF_UNITY, REVERSE_BIT_ORDER_ROOTS_OF_UNITY, get_roots_of_unity
 
 MODULUS = b.curve_order
 
@@ -38,7 +38,7 @@ class TestKzg(unittest.TestCase):
         polynomial = [random.randint(0, MODULUS) for i in range(32)]
         commitment = create_kzg_commitment(polynomial)
 
-        evaluations = [evaluate_poly_in_coefficient_form(polynomial, z) for z in ROOTS_OF_UNITY[:32]]
+        evaluations = [evaluate_poly_in_coefficient_form(polynomial, z) for z in REVERSE_BIT_ORDER_ROOTS_OF_UNITY[:32]]
         commitment2 = blob_to_commitment(evaluations)
         assert b.eq(commitment, commitment2)
         print("tested blob to commttment: {:.3f}s".format(get_time_delta()))
@@ -52,7 +52,7 @@ class TestKzg(unittest.TestCase):
         multiproof = create_kzg_multiproof(polynomial, x, 16)
         print("created multiproof: {:.3f}s".format(get_time_delta()))
 
-        omega = ROOTS_OF_UNITY[:16][1]
+        omega = get_roots_of_unity(16)[1]
         coset = [x * pow(omega, i, MODULUS) for i in range(16)]
         ys = [evaluate_poly_in_coefficient_form(polynomial, z) for z in coset]
 

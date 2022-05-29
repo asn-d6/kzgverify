@@ -4,7 +4,6 @@ import random, time
 
 import params
 from fft import fft
-from roots_of_unity import ROOTS_OF_UNITY
 
 MODULUS = b.curve_order
 
